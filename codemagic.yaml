@@ -1,0 +1,90 @@
+# Codemagic构建配置文件
+# 更多信息：https://docs.codemagic.io/yaml/yaml-getting-started/
+
+workflows:
+  flutter-ios-workflow:
+    name: Flutter iOS构建
+    environment:
+      groups:
+        # 添加证书和配置文件
+        - app_store_connect
+      vars:
+        BUNDLE_ID: "com.yourcompany.flutterdemo"
+        XCODE_WORKSPACE: "Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
+        FLUTTER_VERSION: "3.35.7"
+    scripts:
+      - name: 设置Flutter版本
+        script: |
+          flutter config --enable-web
+          flutter --version
+      - name: 获取依赖
+        script: |
+          flutter pub get
+      - name: 运行测试
+        script: |
+          flutter test
+      - name: 构建iOS应用
+        script: |
+          flutter build ipa --release --no-codesign
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - build/ios/ios/Runner.app
+    publishing:
+      app_store_connect:
+        # 自动发布到App Store Connect
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_ID
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+
+  flutter-android-workflow:
+    name: Flutter Android构建
+    environment:
+      groups:
+        - google_play
+      vars:
+        PACKAGE_NAME: "com.yourcompany.flutterdemo"
+    scripts:
+      - name: 设置Flutter版本
+        script: |
+          flutter --version
+      - name: 获取依赖
+        script: |
+          flutter pub get
+      - name: 运行测试
+        script: |
+          flutter test
+      - name: 构建Android应用
+        script: |
+          flutter build appbundle --release
+    artifacts:
+      - build/app/outputs/bundle/release/*.aab
+      - build/app/outputs/apk/release/*.apk
+    publishing:
+      google_play:
+        # 自动发布到Google Play
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+
+  flutter-web-workflow:
+    name: Flutter Web构建
+    environment:
+      vars:
+        FLUTTER_VERSION: "3.35.7"
+    scripts:
+      - name: 设置Flutter版本
+        script: |
+          flutter config --enable-web
+          flutter --version
+      - name: 获取依赖
+        script: |
+          flutter pub get
+      - name: 构建Web应用
+        script: |
+          flutter build web --release
+    artifacts:
+      - build/web/**
+    publishing:
+      # 可以配置自动部署到GitHub Pages或其他静态网站托管服务
+      scripts:
+        - echo "Web构建完成，可以部署到静态托管服务"

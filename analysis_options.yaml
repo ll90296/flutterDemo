@@ -1,0 +1,67 @@
+# This file configures the static analysis results for your project.
+# For a list of available lints, see https://dart.dev/tools/linter-rules.
+
+include: package:flutter_lints/flutter.yaml
+
+# Additional lints that can be added for stricter code quality
+linter:
+  rules:
+    # Common good practices
+    - avoid_print
+    - avoid_renaming_method_parameters
+    - avoid_unused_constructor_parameters
+    - avoid_void_async
+    - cancel_subscriptions
+    - constant_identifier_names
+    - control_flow_in_finally
+    - directives_ordering
+    - empty_catches
+    - empty_constructor_bodies
+    - library_names
+    - library_prefixes
+    - no_duplicate_case_values
+    - non_constant_identifier_names
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_fields
+    - prefer_final_locals
+    - prefer_typing_uninitialized_variables
+    - sort_constructors_first
+    - sort_unnamed_constructors_first
+    - type_init_formals
+    - unnecessary_brace_in_string_interps
+    - unnecessary_const
+    - unnecessary_new
+    - unnecessary_null_comparison
+    - unnecessary_this
+    - unrelated_type_equality_checks
+    - use_key_in_widget_constructors
+    - use_rethrow_when_possible
+    - valid_regexps
+
+# Additional analyzer options
+analyzer:
+  exclude:
+    - '**/*.g.dart'
+    - '**/*.freezed.dart'
+    - '**/*.gr.dart'
+    - 'build/**'
+  errors:
+    # Treat missing required parameters as an error, not a warning
+    missing_required_param: error
+    # Treat missing return as an error, not a warning
+    missing_return: error
+    # Treat invalid assignment as an error
+    invalid_assignment: error
+    # Treat undefined class as an error
+    undefined_class: error
+    # Treat undefined identifier as an error
+    undefined_identifier: error
+    # Treat undefined prefix as an error
+    undefined_prefix: error
+    # Treat invalid_type_argument as an error
+    invalid_type_argument: error
+    # Treat invalid_cast as an error
+    invalid_cast: error
+    # Treat invalid_use_of_visible_for_testing_member as an error
+    invalid_use_of_visible_for_testing_member: error
