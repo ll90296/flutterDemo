@@ -27,6 +27,8 @@ workflows:
       - name: 构建iOS应用
         script: |
           flutter build ipa --release --no-codesign
+          echo "iOS构建完成，检查构建产物..."
+          ls -la build/ios/ipa/ || echo "构建目录不存在，检查构建日志"
     artifacts:
       - build/ios/ipa/*.ipa
       - build/ios/ios/Runner.app
