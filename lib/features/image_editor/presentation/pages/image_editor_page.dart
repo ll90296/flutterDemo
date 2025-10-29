@@ -6,7 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:html' as html;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class _SaveImageData {
   final Uint8List selectedImageBytes;
@@ -351,14 +352,10 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
       // 使用异步处理避免阻塞UI
       final Uint8List resultBytes = await _processImageAsync();
       
-      // 在Web环境中保存图片
-      _saveImageForWeb(resultBytes);
+      // 保存图片（支持所有平台）
+      await _saveImage(resultBytes);
       
       print('图片保存成功！');
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('图片保存成功！')),
-      );
       
     } catch (e, stackTrace) {
       print('图片保存失败: $e');
@@ -495,34 +492,35 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
     }
   }
 
-  void _saveImageForWeb(Uint8List imageBytes) {
-    // 对于Web环境，使用html库进行下载
-    if (kIsWeb) {
-      // 创建Blob
-      final blob = html.Blob([imageBytes], 'image/png');
-      
-      // 创建URL
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      
-      // 创建下载链接
-      final anchor = html.AnchorElement(href: url);
-      anchor.download = 'edited_image_${DateTime.now().millisecondsSinceEpoch}.png';
-      anchor.style.display = 'none';
-      
-      // 添加到页面并触发下载
-      html.document.body!.append(anchor);
-      anchor.click();
-      
-      // 清理
-      Future.delayed(const Duration(seconds: 1), () {
-        anchor.remove();
-        html.Url.revokeObjectUrl(url);
-      });
-    } else {
-      // 对于非Web环境，使用文件保存
-      // 这里可以添加原生平台的保存逻辑
+  Future<void> _saveImage(Uint8List imageBytes) async {
+    try {
+      if (kIsWeb) {
+        // Web环境：使用分享功能
+        await Share.shareXFiles([
+          XFile.fromData(imageBytes, 
+            name: 'edited_image_${DateTime.now().millisecondsSinceEpoch}.png',
+            mimeType: 'image/png'
+          )
+        ]);
+      } else {
+        // 移动端环境：保存到相册并分享
+        final tempDir = await getTemporaryDirectory();
+        final filePath = '${tempDir.path}/edited_image_${DateTime.now().millisecondsSinceEpoch}.png';
+        final file = File(filePath);
+        
+        await file.writeAsBytes(imageBytes);
+        
+        // 分享图片
+        await Share.shareXFiles([XFile(filePath)]);
+        
+        // 显示成功消息
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('图片已保存并准备分享')),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('保存功能仅支持Web环境')),
+        SnackBar(content: Text('保存失败: $e'), backgroundColor: Colors.red),
       );
     }
   }
