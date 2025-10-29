@@ -1,8 +1,8 @@
 # Android
-/android/
-/android/app/debug/
-/android/app/profile/
-/android/app/release/
+# /android/  # 注释掉这一行，允许Android配置文件提交
+# /android/app/debug/
+# /android/app/profile/
+# /android/app/release/
 
 # iOS
 # /ios/  # 注释掉这一行，允许iOS配置文件提交
